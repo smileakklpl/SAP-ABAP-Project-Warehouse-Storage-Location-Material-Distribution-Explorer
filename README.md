@@ -341,8 +341,6 @@ SAP-ABAP-Project-Warehouse-Storage-Location-Material-Distribution-Explorer/
 │       ├── ls03n_dxtr1000.png                 # 圖 21
 │       └── ls03n_kpad1012.png                 # 圖 22
 │
-├── file1.pdf
-├── file2.pdf
 └── README.md
 ```
 
