@@ -43,6 +43,8 @@
 
 ![ER Model](images/er_model/er_model_final.png)
 
+**圖 1：ER Model** — 系統使用六張 SAP 標準資料表，分為報表查詢層（LQUA / MAKT / MARC / LAGP）與補貨作業層（LTAK / LTAP）。
+
 ### 資料表說明 (Table Reference)
 
 #### 報表查詢層
@@ -82,6 +84,8 @@ LTAP : LGNUM / TANUM / TAPOS / MATNR / WERKS / VLTYP / VLPLA / NLTYP / NLPLA / V
 
 ![報表初始輸入介面](images/report/selection_screen.png)
 
+**圖 2：報表初始輸入介面** — 提供 Select-Options 範圍查詢，突破 LS26 單筆查詢限制；留空執行可列出倉庫中所有物料。
+
 ---
 
 ### Step 1 — Level 1：物料預警層
@@ -90,13 +94,16 @@ LTAP : LGNUM / TANUM / TAPOS / MATNR / WERKS / VLTYP / VLPLA / NLTYP / NLPLA / V
 
 - 總可用庫存（全儲位加總）**< 10** → 整列標紅 + 畫面上方顯示補貨提醒
 - `MINBE` 欄位預留於介面，待資料完備後可直接切換判斷邏輯，無需修改程式
-- 統計列表：顯示物料總筆數與低庫存筆數
+- 下方統計列表顯示物料總筆數與低庫存筆數
+- **操作：** 點擊任一資料列 → 展開至 Level 2
 
-**操作：** 點擊任一資料列 → 展開至 Level 2
+![第一層報表介面](images/report/level1_overview.png)
 
-![第一層：物料總覽](images/report/level1_overview.png)
+**圖 3：第一層報表介面** — 彙總全廠各物料的可用庫存總量，欄位標頭附中文說明。`MINBE`（安全庫存）欄位預留，未來資料到位後可直接切換為與其比對的判斷邏輯。
 
-![第一層：低庫存補貨提醒](images/report/level1_alert.png)
+![物料補貨提醒功能](images/report/level1_alert.png)
+
+**圖 4：物料補貨提醒功能** — 當某物料的總可用庫存（VERME 加總）低於門檻值 10 時，整列標紅並在表格頂端顯示補貨提醒，讓倉管人員一眼辨識需優先處理的物料。
 
 ---
 
@@ -106,11 +113,15 @@ LTAP : LGNUM / TANUM / TAPOS / MATNR / WERKS / VLTYP / VLPLA / NLTYP / NLPLA / V
 
 - 儲位可用庫存 **< 10** → 整列標紅 + 統計低庫存筆數
 - **雙擊一般庫存列** → 展開至 Level 3（查看儲位物理屬性）
-- **雙擊紅色低庫存列** → 觸發補貨對話視窗（Screen 9000）
+- **雙擊紅色低庫存列** → 直接觸發補貨對話視窗（Screen 9000）
 
-![第二層：DXTR1000 儲位分佈](images/report/level2_dxtr1000.png)
+![第二層報表介面（DXTR1000 物料）](images/report/level2_dxtr1000.png)
 
-![第二層：KPAD1012 儲位分佈](images/report/level2_kpad1012.png)
+**圖 5：第二層報表介面（DXTR1000 物料）** — 展開 DXTR1000 在各儲位的庫存分佈。儲位 4500000132（庫存 0）與 4500000329（庫存 1）因低於門檻而標紅；STBN-7-000（庫存 10）正常。標紅列可直接雙擊觸發補貨。
+
+![第二層報表介面（KPAD1012 物料）](images/report/level2_kpad1012.png)
+
+**圖 6：第二層報表介面（KPAD1012 物料）** — 展開 KPAD1012 的儲位分佈。STBN-1-012（001 Shelf Storage）與 4500000087（003 GR Area）的庫存皆為 0，兩列皆標紅，顯示此物料全部儲位皆已缺貨。
 
 ---
 
@@ -122,56 +133,110 @@ LTAP : LGNUM / TANUM / TAPOS / MATNR / WERKS / VLTYP / VLPLA / NLTYP / NLPLA / V
 - 下半部顯示該儲位「關聯庫存明細（Associate Traversal）」——列出所有物料及各自的可用庫存
 - 點擊此層任一列 → 彈出提示（已達最底層，無法繼續展開）
 
-![第三層：STBN-7-000 儲位屬性](images/report/level3_stbn7000.png)
+![第三層報表介面（STBN-7-000 儲位）](images/report/level3_stbn7000.png)
 
-![第三層：4500000329 儲位屬性](images/report/level3_4500000329.png)
+**圖 7：第三層報表介面（STBN-7-000 儲位）** — 顯示 STBN-7-000 的物理屬性：最大容量重量 9999 LB，已使用重量 562.842 LB，資料與 LS03N 核對一致。下半部關聯明細顯示該儲位含 DXTR1000 與 DXTR1031 兩種物料。
 
-![第三層：STBN-1-012 儲位屬性](images/report/level3_stbn1012.png)
+![第三層介面（4500000329 儲位）](images/report/level3_4500000329.png)
 
-![第三層：底層彈窗提示](images/report/level3_popup.png)
+**圖 8：第三層介面（4500000329 儲位）** — 此儲位未設定容量重量，MGEWI 與 LGEWI 均顯示「初始欄位未設定」。並非所有儲位皆有重量設定，系統可正常處理此情況。
+
+![第三層報表介面（STBN-1-012 儲位）](images/report/level3_stbn1012.png)
+
+**圖 9：第三層報表介面（STBN-1-012 儲位）** — 顯示 STBN-1-012 的物理屬性與關聯庫存明細，儲位內包含 EPAD1012 與 KPAD1012 兩種物料。
+
+![跳轉彈窗介面](images/report/level3_popup.png)
+
+**圖 10：跳轉彈窗介面** — 點擊 Level 3 任一資料列時，系統彈出提示告知使用者「已達最底層，無法繼續展開」，防止誤操作並給予明確的操作回饋。
 
 ---
 
 ### Step 4 — 內部調撥補貨（Screen 9000）
 
-在 Level 2 雙擊紅色低庫存儲位後進入補貨對話視窗。
+在 Level 2 **雙擊紅色低庫存儲位**後，系統透過 `AT LINE-SELECTION` 接收鍵值並呼叫 `CALL SCREEN 9000`，進入補貨對話視窗。
+
+![DXTR1000 報表第二層介面（補貨觸發點）](images/report/level2_dxtr1000.png)
+
+**圖 11：DXTR1000 報表第二層介面** — 操作提示說明雙擊低庫存列（< 10）可直接建立補貨任務。以 4500000329（庫存 1，缺少 9 個單位）為例雙擊觸發 Screen 9000。
+
+![內部調撥補貨介面（Screen 9000）](images/replenishment/dialog_screen9000.png)
+
+**圖 12：內部調撥補貨介面（Screen 9000）** — 進入視窗後，物料、工廠、倉庫、目標儲位類型與目標儲位（4500000329）由系統自動帶入為唯讀欄位。系統同時自動搜尋上游庫存，預填來源儲位（STBN-7-000）與建議補貨數量（9.000）。倉管人員確認後點擊「確認建立」送出。
 
 | 欄位類型 | 欄位 |
 |----------|------|
 | **唯讀（系統自動帶入）** | 物料編號 / 工廠 / 倉庫號 / 目標儲位類型 / 目標儲位 |
-| **可輸入（倉管人員填寫）** | 來源儲位類型 / 來源儲位 / 補貨數量（系統自動預填建議值） |
+| **可輸入（倉管人員確認）** | 來源儲位類型 / 來源儲位 / 補貨數量 |
 
 **防呆機制（Validation）：**
 
-| 防呆情境 | 訊息類型 | 說明 |
-|----------|----------|------|
-| 數量未輸入 / ≤ 0 | `Type E` | 阻止送出，要求輸入有效數量 |
-| 來源儲位庫存不足 | `Type E` | 提示調整數量或選擇其他來源儲位 |
-| 儲位處於凍結狀態 | `Type E` | 阻止使用凍結儲位 |
-| 來源與目標儲位相同 | `Type E` | 防止無效調撥 |
-| 全部儲位庫存不足 | `Type S` | 阻擋進入 Screen 9000，提示補充上游庫存 |
-| 建立成功 | `Type S` | 顯示新建轉帳單號（TANUM）確認落庫 |
+| 防呆情境 | 訊息類型 | 觸發位置 |
+|----------|----------|----------|
+| 數量未輸入 / ≤ 0 | `Type E` | `dialog_pai` |
+| 來源儲位庫存不足 | `Type E` | `dialog_pai` |
+| 儲位處於凍結狀態 | `Type E` | `dialog_pai` |
+| 來源與目標儲位相同 | `Type E` | `dialog_pai` |
+| 補貨數量格式無法轉換 | `Type E` | `dialog_submit` |
 
-![補貨對話視窗（Screen 9000）](images/replenishment/dialog_screen9000.png)
+![儲位與數量警示信息](images/replenishment/error_stock.png)
 
-![錯誤：來源儲位庫存不足](images/replenishment/error_stock.png)
+**圖 13：儲位與數量警示信息** — 當填入的來源儲位庫存不足，系統顯示 Type E 錯誤「來源儲位庫存不足，請調整數量或選擇其他來源」，阻止送出並要求重新輸入。
 
-![錯誤：數量需大於 0](images/replenishment/error_qty.png)
+![數量警示信息](images/replenishment/error_qty.png)
 
-![通知：找不到可用來源儲位](images/replenishment/upstream_notice.png)
+**圖 14：數量警示信息** — 當補貨數量未填或小於等於 0，系統顯示 Type E 錯誤「輸入數量需大於 0」，防止無效補貨任務建立。
+
+![上游補貨通知信息](images/replenishment/upstream_notice.png)
+
+**圖 15：上游補貨通知信息** — 當物料所有儲位庫存皆為 0（如 KPAD1012），系統在 Level 2 即阻擋進入 Screen 9000，顯示「找不到可用來源儲位，請先補充上游庫存」，告知倉管人員需從上游進貨。
 
 ---
 
 ### Step 5 — 任務追蹤清單（閉環確認）
 
-補貨任務成功建立後，系統自動寫入 `LTAK` / `LTAP`，並切換至追蹤報表：
-
-- **抬頭資訊：** 轉帳單號（`TANUM`）/ 倉庫號碼 / 建立日期與時間 / 建立人員
-- **項目明細：** 物料代號 / 物料說明 / 工廠 / 補貨數量 / 來源儲位 / 目標儲位
+補貨任務成功建立後，系統自動寫入 `LTAK`（抬頭）與 `LTAP`（項目），並透過 `SUPPRESS DIALOG` + `LEAVE TO LIST-PROCESSING` 切換至追蹤報表。
 
 ![建立成功 Message](images/replenishment/success_message.png)
 
-![內部調撥任務追蹤介面](images/replenishment/tracking_report.png)
+**圖 16：建立成功 Message** — 補貨任務建立成功時顯示 Type S 訊息「已建立補貨任務 XXXXXXXXXX」，讓倉管人員即時確認轉帳單號（TANUM）已落庫。
+
+![內部調撥補貨任務追蹤介面](images/replenishment/tracking_report.png)
+
+**圖 17：內部調撥補貨任務追蹤介面** — 自動切換至追蹤清單，顯示完整任務資訊：
+- **抬頭：** 轉帳單號（`TANUM`）/ 倉庫號碼 / 建立日期與時間 / 建立人員
+- **項目：** 物料代號 / 物料說明 / 工廠 / 補貨數量 / 來源儲位（格式：`LGTYP/LGPLA`）/ 目標儲位
+
+---
+
+## SAP 系統驗證截圖 (SAP System Validation)
+
+開發前透過 SAP 標準 T-Code 驗證資料，確保報表欄位與底層資料表數值完全吻合。
+
+| T-Code | 用途 |
+|--------|------|
+| `LS26` | 倉庫物料概覽——驗證各物料在各倉儲類型與儲位的庫存數值 |
+| `LS03N` | 儲位主檔——驗證 `MGEWI`（最大容量重量）與 `LGEWI`（已使用重量）|
+| `SE16N` | 直接查詢 `LQUA` 資料表，逐欄核對欄位定義與數值 |
+
+![LS26 搜尋介面](images/sap_validation/ls26_search.png)
+
+**圖 18：LS26 搜尋介面** — 輸入倉庫號碼（100）與物料代碼，查詢標準 SAP 倉庫物料概覽。
+
+![LS26 物料搜尋結果（DXTR1000）](images/sap_validation/ls26_dxtr1000.png)
+
+**圖 19：物料搜尋結果（DXTR1000）** — DXTR1000 在各倉儲類型的庫存數值，用於與報表 Level 2（圖 5）數據進行核對驗證。
+
+![LS26 物料搜尋結果（KPAD1012）](images/sap_validation/ls26_kpad1012.png)
+
+**圖 20：物料搜尋結果（KPAD1012）** — KPAD1012 在各倉儲類型的庫存數值，兩個儲位皆為 0，與 Level 2 紅色警示（圖 6）結果一致。
+
+![LS03N DXTR1000 儲位詳情](images/sap_validation/ls03n_dxtr1000.png)
+
+**圖 21：LS03N 搜尋介面（DXTR1000）** — 查詢 STBN-7-000 儲位的最大容量重量（9999 LB）與已使用重量（562.842 LB），數值與 Level 3 報表（圖 7）核對一致。
+
+![LS03N KPAD1012 儲位詳情](images/sap_validation/ls03n_kpad1012.png)
+
+**圖 22：LS03N 搜尋介面（KPAD1012）** — 查詢 STBN-1-012 儲位的物理屬性，與 Level 3 報表（圖 9）顯示數據進行驗證。
 
 ---
 
@@ -246,38 +311,38 @@ SAP-ABAP-Project-Warehouse-Storage-Location-Material-Distribution-Explorer/
 ├── Z01_WAREHOUSE.prog.abap                    # 三層互動式庫存報表主程式
 ├── ZFIN01_12_053068_WM_WAREHOUSE.prog.abap    # 整合補貨系統完整版主程式
 │
-├── images/                                    # 截圖資料夾（請手動放入圖片）
+├── images/
 │   ├── er_model/
-│   │   └── er_model_final.png                 # 完整 ER Model（六張資料表）
+│   │   └── er_model_final.png                 # 圖 1
 │   │
-│   ├── sap_validation/                        # SAP 標準介面驗證截圖
-│   │   ├── ls26_search.png
-│   │   ├── ls26_dxtr1000.png
-│   │   ├── ls26_kpad1012.png
-│   │   ├── ls03n_dxtr1000.png
-│   │   └── ls03n_kpad1012.png
+│   ├── report/
+│   │   ├── selection_screen.png               # 圖 2
+│   │   ├── level1_overview.png                # 圖 3
+│   │   ├── level1_alert.png                   # 圖 4
+│   │   ├── level2_dxtr1000.png                # 圖 5、圖 11
+│   │   ├── level2_kpad1012.png                # 圖 6
+│   │   ├── level3_stbn7000.png                # 圖 7
+│   │   ├── level3_4500000329.png              # 圖 8
+│   │   ├── level3_stbn1012.png                # 圖 9
+│   │   └── level3_popup.png                   # 圖 10
 │   │
-│   ├── report/                                # 三層報表系統截圖
-│   │   ├── selection_screen.png               # 初始輸入介面
-│   │   ├── level1_overview.png                # Level 1：物料總覽
-│   │   ├── level1_alert.png                   # Level 1：低庫存補貨提醒
-│   │   ├── level2_dxtr1000.png                # Level 2：DXTR1000 儲位分佈
-│   │   ├── level2_kpad1012.png                # Level 2：KPAD1012 儲位分佈
-│   │   ├── level3_stbn7000.png                # Level 3：STBN-7-000 儲位屬性
-│   │   ├── level3_4500000329.png              # Level 3：4500000329 儲位屬性
-│   │   ├── level3_stbn1012.png                # Level 3：STBN-1-012 儲位屬性
-│   │   └── level3_popup.png                   # Level 3：底層彈窗提示
+│   ├── replenishment/
+│   │   ├── dialog_screen9000.png              # 圖 12
+│   │   ├── error_stock.png                    # 圖 13
+│   │   ├── error_qty.png                      # 圖 14
+│   │   ├── upstream_notice.png                # 圖 15
+│   │   ├── success_message.png                # 圖 16
+│   │   └── tracking_report.png                # 圖 17
 │   │
-│   └── replenishment/                         # 補貨系統截圖
-│       ├── dialog_screen9000.png              # Screen 9000 補貨對話視窗
-│       ├── error_stock.png                    # 來源庫存不足錯誤
-│       ├── error_qty.png                      # 數量格式/零值錯誤
-│       ├── upstream_notice.png                # 找不到來源儲位通知
-│       ├── success_message.png                # 建立成功 Message
-│       └── tracking_report.png                # 任務追蹤清單
+│   └── sap_validation/
+│       ├── ls26_search.png                    # 圖 18
+│       ├── ls26_dxtr1000.png                  # 圖 19
+│       ├── ls26_kpad1012.png                  # 圖 20
+│       ├── ls03n_dxtr1000.png                 # 圖 21
+│       └── ls03n_kpad1012.png                 # 圖 22
 │
-├── file1.pdf                                  # 系統設計說明書（補貨系統）
-├── file2.pdf                                  # 系統設計說明書（三層報表）
+├── file1.pdf
+├── file2.pdf
 └── README.md
 ```
 
